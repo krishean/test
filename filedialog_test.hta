@@ -1,0 +1,69 @@
+<html>
+<head>
+<HTA:APPLICATION ID="oHTA"
+	APPLICATIONAME="myApp"
+	MAXIMIZEBUTTON="no"
+	SINGLEINSTANCE="yes"
+	BORDER="thin"
+	INNERBORDER="no">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+<title>filedialog test</title>
+<script type="text/javascript">
+//<![CDATA[
+
+var wShell=new ActiveXObject('WScript.Shell');
+var fso=new ActiveXObject('Scripting.FileSystemObject');
+
+var ScriptHost='mshta';
+
+window.onload=function(){
+    var w=800,h=600;
+    window.resizeTo(w,h);
+    window.moveTo((screen.availWidth/2)-(w/2),(screen.availHeight/2)-(h/2));
+    var result=psfiledialog('CSV files (*.csv)|*.csv|All Files (*.*)|*.*','csv','Save As CSV',true);
+    if(result==''){
+        echo('user clicked close or cancel');
+    }else{
+        echo('user entered:\n"'+result+'"');
+    }
+};
+
+// https://stackoverflow.com/a/56740935
+// use powershell to do our bidding, it's slower but works on both x64 and x86
+function psfiledialog(filt, def, title, save){
+    var psScript=['[System.Reflection.Assembly]::LoadWithPartialName(\'System.Windows.Forms\')|Out-Null'];
+    if(save==true){
+        psScript.push('$dlg=New-Object System.Windows.Forms.SaveFileDialog');
+        psScript.push('$dlg.DefaultExt=\''+def+'\'');
+    }else{
+        psScript.push('$dlg=New-Object System.Windows.Forms.OpenFileDialog');
+    }
+    psScript.push('$dlg.Filter=\''+(filt==''?'All Files (*.*)|*.*':filt)+'\'');
+    psScript.push('$dlg.FilterIndex=1');
+    psScript.push('$dlg.Title=\''+title.replace(/'/g,'\'\'')+'\'');
+    psScript.push('$dlg.initialDirectory=[Environment]::GetFolderPath(\'MyDocuments\')');
+    psScript.push('$dlg.ShowDialog()|Out-Null');
+    psScript.push('Write-Host $dlg.FileName');
+    return wShell.Exec('powershell -NoLogo -NoProfile -ExecutionPolicy RemoteSigned'+
+        (ScriptHost=='cscript'?'':' -WindowStyle hidden')+' -Command "'+psScript.join(';')+';"').StdOut.ReadLine();
+}
+
+/*
+function echo(String str);
+
+Method for displaying messages. Automatically determines the right function to call.
+
+*/
+function echo(str){
+	try{if(typeof(window)==='object'){return window.alert(str);}}catch(err){} // when running from a HTA or web browser
+	try{if(typeof(WScript)==='object'){return WScript.Echo(str);}}catch(err){} // when running under WSH
+}
+
+//]]>
+</script>
+</head>
+<body>
+<div id="page"></div>
+</body>
+</html>
