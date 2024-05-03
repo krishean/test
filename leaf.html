@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>leaf</title>
+<script type="text/javascript">
+//<![CDATA[
+window.addEventListener('DOMContentLoaded',event=>{
+    const ctx=document.querySelector('#canvas').getContext('2d');
+    ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+    ctx.fillStyle='rgba(0,0,0,1)';
+    ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
+    ctx.fillStyle='rgba(92,221,8,1)';
+    for(var x=0,y=0,n,i=0;i<100000;i++){
+        n=Math.random();
+        [x,y]=n<.01?[0,.16*y]:
+            (n>=.01&&n<=.08?[.2*x-.26*y,.23*x+.22*y+1.6]:
+            (n>=.08&&n<=.15?[-.15*x+.28*y,.26*x+.24*y+.44]:
+            [.85*x+.04*y,-.04*x+.85*y+1.6]));
+        ctx.fillRect(x*45+320,-(y*45-225)+240,1,1);
+    }
+});
+//]]>
+</script>
+<style type="text/css">
+/*<![CDATA[*/
+:root {
+  --color: #000000;
+  --bgcolor: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color: #e3e3e3;
+    --bgcolor: #202020;
+  }
+}
+html, body {
+  height: 100vh;
+  margin: 0;
+}
+body {
+  display: flex;
+  color: var(--color);
+  background-color: var(--bgcolor);
+}
+body>div {
+  margin: auto;
+}
+/*]]>*/
+</style>
+</head>
+<body>
+<div>
+<canvas id="canvas" width="640" height="480" style="cursor: default;"></canvas>
+</div>
+</body>
+</html>
